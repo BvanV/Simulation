@@ -17,12 +17,12 @@ public class newShip extends newBlock {
 	final int SH_WAITING 	= 0;
 	final int SH_MOVING 	= 1;
 	
-	public newShip(int ind, int len, int wid, int ypos, int destinX) {
+	public newShip(int ind, int pYsize, int pXsize, int len, int wid, int ypos, int destinX) {
 		super();
     	ysize	= 2 + random(3);
     	xsize	= 2*ysize + random(2);
 		size	= xsize * ysize;
-        speedX 	= 0;
+        speedX 	= 10;
         speedY 	= 0;
         red 	= 160;
         green 	= 160;
@@ -35,24 +35,26 @@ public class newShip extends newBlock {
     	x 		= 0 - width;
     	y 		= ypos;
     	destX	= destinX;
+    	status	= SH_MOVING;
         MaxSpeedX = (width / 10) * (random(5) + 1);
         blokjes = new newTFE[xsize*ysize];
         for(int i=0;i<ysize;i++) {
         	for(int j=0;j<xsize;j++) {
-        		blokjes[i*xsize + j] = new newTFE(i*xsize + j, MovingBlocksv2_03.CONTAINER_WIDTH, MovingBlocksv2_03.CONTAINER_LENGTH);
-        		blokjes[i*xsize + j].setX(x + (MovingBlocksv2_03.CONTAINER_LENGTH / 2) + j * MovingBlocksv2_03.CONTAINER_LENGTH);
-        		blokjes[i*xsize + j].setY(y + (MovingBlocksv2_03.CONTAINER_WIDTH / 2) + i * MovingBlocksv2_03.CONTAINER_WIDTH);
+        		blokjes[i*xsize + j] = new newTFE(i*xsize + j, MainPanel.CONTAINER_WIDTH, MainPanel.CONTAINER_LENGTH);
+        		blokjes[i*xsize + j].setX(x + (MainPanel.CONTAINER_LENGTH / 2) + j * MainPanel.CONTAINER_LENGTH);
+        		blokjes[i*xsize + j].setY(y + (MainPanel.CONTAINER_WIDTH / 2) + i * MainPanel.CONTAINER_WIDTH);
         	}
         }
     }
-	
-    public int random(int maxRange) {
+
+	public int random(int maxRange) {
         return (int) Math.round(Math.random() * maxRange);
     }
     
-    public void move(MovingBlocksv2_03.Container container) {
+    public void move(MainPanel.Container container) {
     	if(status == SH_MOVING) {
     		if(x + speedX > destX) {
+    			moveContainers(destX - x, 0, container);
     			x = destX;
     		} else {
     			x += speedX;
@@ -91,7 +93,20 @@ public class newShip extends newBlock {
 //			releaseSpace();
 //		}
 	}
-		
+	
+    /**
+     * Move the containers on the ship
+     * @param Xdist vertical distance, positive means to the right
+     * @param Ydist vertical distance, positive means going down.
+     */
+    private void moveContainers(int Xdist, int Ydist, MainPanel.Container container) {
+    	for(int i=0;i<size;i++) {
+    		if(blokjes[i] != null) {
+    			blokjes[i].move(Xdist, 0, container);
+    		}
+    	}
+    }
+    
 	public void releaseAll() {
 //		for(int i=0; i< field.length;i++) {
 //			if(field[i][0][0] == index) {

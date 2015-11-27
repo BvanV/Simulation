@@ -6,8 +6,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 
-import java.util.ArrayList;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -34,7 +32,7 @@ import javax.swing.JPanel;
  * v3.00 Code improvements
  * 
  */
-public class MovingBlocksv2_03 extends JPanel implements MouseListener {
+public class MainPanel extends JPanel implements MouseListener {
 
 	/**
 	 * 
@@ -66,7 +64,7 @@ public class MovingBlocksv2_03 extends JPanel implements MouseListener {
         return (int) Math.round((Math.random() * maxRange));
     }
 
-    public MovingBlocksv2_03(int width, int height) {
+    public MainPanel(int width, int height) {
 
         canvasWidth = width;
         canvasHeight = height;
@@ -173,19 +171,6 @@ public class MovingBlocksv2_03 extends JPanel implements MouseListener {
         }
     }
 
-    public static void main(String[] args) {
-
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JFrame f = new JFrame(TITLE);
-                f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                f.setContentPane(new MovingBlocksv2_03(SCREEN_WIDTH, SCREEN_HEIGHT));
-                f.pack();
-                f.setVisible(true);
-            }
-        });
-    }
-
     @Override
     public void mouseClicked(MouseEvent e) {
         // TODO Auto-generated method stub
@@ -206,8 +191,13 @@ public class MovingBlocksv2_03 extends JPanel implements MouseListener {
     		boolean done = false;
     		while(i<MAX_NUMBER_OF_BLOCKS && !done) {
     			if(blocks[i] == null) {
-    				blocks[i] = new newShip(i);
-    				int ind, int len, int wid, int ypos, int destinX);
+    				int ysize	= 2 + random(3);
+    		    	int xsize	= 2*ysize + random(2);
+    		    	int length	= (xsize + 1) * (CONTAINER_LENGTH);
+    		    	int width 	= (ysize + 1) * (CONTAINER_WIDTH);
+    		    	int ypos	= WATER_HEIGHT - width;
+    		    	int destinX	= CONTAINER_FIELD_OFFSET;
+    				blocks[i] = new newShip(i, ysize, xsize, length, width, ypos, destinX);
     				done = true;
     			}
     			i++;

@@ -2,8 +2,6 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 
-import javax.swing.JPanel;
-
 public class newTFE extends newBlock {
    
     public newTFE() {}
@@ -47,7 +45,10 @@ public class newTFE extends newBlock {
     public void releaseReservedSpace() {
     }
     
-    public void move(Container container) { }
+    public void move(int Xdist, int Ydist, MainPanel.Container container) { 
+    	x += Xdist;
+    	y += Ydist;
+    }
 
 	public int getX() {
 		return x;
