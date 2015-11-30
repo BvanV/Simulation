@@ -5,6 +5,8 @@ import javax.swing.JPanel;
 
 
 class PaintArea extends JPanel {
+
+	private static final long serialVersionUID = 7471887303263865455L;
 	private CustomContainer container;
 	private newBlock water;
 	private newField containerField;
@@ -13,10 +15,11 @@ class PaintArea extends JPanel {
     private int canvasHeight;	
     private newCrane[] cranes;
     private newShip[] ships;
-    private int CONTAINER_LENGTH = 20;
-    private int CONTAINER_WIDTH = 5;
-    private int WATER_HEIGHT = 300;
-    private int CONTAINER_FIELD_OFFSET = 1200;
+    private int SCREEN_WIDTH 			= MainPanel.SCREEN_WIDTH;
+    private int CONTAINER_LENGTH 		= MainPanel.CONTAINER_LENGTH;
+    private int CONTAINER_WIDTH 		= MainPanel.CONTAINER_WIDTH;
+    private int WATER_HEIGHT 			= MainPanel.WATER_HEIGHT;
+    private int CONTAINER_FIELD_OFFSET 	= MainPanel.CONTAINER_FIELD_OFFSET;
 	
     public PaintArea() {}
     
@@ -29,7 +32,7 @@ class PaintArea extends JPanel {
     	water = new newBlock(0,0,w,WATER_HEIGHT,51,153,255);
     	containerField = new newField(CONTAINER_FIELD_OFFSET, WATER_HEIGHT,200, 500, 255, 204, 153, 4, 50);
     	cranes = new newCrane[1];
-    	cranes[0] = new newCrane(0, CONTAINER_FIELD_OFFSET + 20, WATER_HEIGHT + 50);
+    	cranes[0] = new newCrane(0, CONTAINER_FIELD_OFFSET + 20, WATER_HEIGHT + 10 * CONTAINER_WIDTH);
     	ships = new newShip[MAX_NUMBER_OF_BLOCKS];
     }
 	
@@ -60,6 +63,21 @@ class PaintArea extends JPanel {
     	cranes[0].move(container);
     }
     
+    public void moveShips() {
+	   	for(int i=0;i<MAX_NUMBER_OF_BLOCKS;i++) {
+			if(ships[i] != null) {
+				if(ships[i].x < SCREEN_WIDTH) {
+					ships[i].move(container);
+				} else if (ships[i].getInactiveTime() < 10) {
+					ships[i].setInactiveTime(ships[i].getInactiveTime() + 1);
+					ships[i].releaseAll();
+				} else {
+					ships[i] = null;
+				}
+			}
+		}	
+    }
+    
 	public void paintComponent(Graphics g) {
         super.paintComponent(g);
         container.draw(g);
@@ -78,14 +96,13 @@ class PaintArea extends JPanel {
         		}
         	}
         }
-//        container_field.draw(g);
-//        for(int i=0;i<container_field.xsize;i++) {
+        for(int i=0;i<containerField.getXsize();i++) {
 //        	for(int j=0;j<container_field.ysize;j++) {
 //        		if(container_field.blocks[i][j] != null) {
 //            		container_field.blocks[i][j].draw(g);
 //        		}
 //        	}
-//        }            
+        }            
 
     }
 

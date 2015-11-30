@@ -4,10 +4,10 @@ import java.awt.Graphics;
 
 
 public class newCrane extends newBlock {
-	private int CONTAINER_LENGTH = 20;
-	private int CONTAINER_WIDTH = 5;
-	private int CONTAINER_FIELD_OFFSET = 300;
-	private int WATER_HEIGHT = 400;
+	private static final long serialVersionUID = -9076651078827732361L;
+	private int CONTAINER_LENGTH 		= MainPanel.CONTAINER_LENGTH;
+	private int CONTAINER_WIDTH 		= MainPanel.CONTAINER_WIDTH;
+	private int WATER_HEIGHT 			= MainPanel.WATER_HEIGHT;
 
 	
 	newBlock[] parts;

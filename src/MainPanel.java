@@ -30,16 +30,15 @@ import javax.swing.JPanel;
  */
 public class MainPanel extends JPanel implements MouseListener {
 
-	private static int SCREEN_WIDTH = 1200;
-	private static int SCREEN_HEIGHT = 700;
-	private static int WATER_HEIGHT = 300;
-	private static int MAX_NUMBER_OF_BLOCKS = 20;
-	static int CONTAINER_LENGTH = 20;
-	static int CONTAINER_WIDTH = (CONTAINER_LENGTH * 2438)/6096;
-	private static int CONTAINER_FIELD_WIDTH = 4 * CONTAINER_LENGTH + 4 * CONTAINER_WIDTH;
-	static int CONTAINER_FIELD_OFFSET = SCREEN_WIDTH - CONTAINER_FIELD_WIDTH - (10 * CONTAINER_LENGTH);
-	private static int FIELD_WIDTH = CONTAINER_LENGTH * 20;
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -7593664380166699676L;
+	static final int SCREEN_WIDTH 			= 1800;
+	static final int SCREEN_HEIGHT 			= 1000;		
+	final static int CONTAINER_WIDTH 		= 8;
+	final static int CONTAINER_LENGTH 		= (CONTAINER_WIDTH * 6096) / 2438;
+	final static int WATER_HEIGHT			= 300;
+	final static int CONTAINER_FIELD_WIDTH 	= 4 * CONTAINER_LENGTH + 4 * CONTAINER_WIDTH;
+	final static int CONTAINER_FIELD_OFFSET	= SCREEN_WIDTH - CONTAINER_FIELD_WIDTH - (10 * CONTAINER_LENGTH);
+	
     private CustomContainer container;
     private PaintArea pArea;
     public static final int UPDATE_RATE = 30;
@@ -48,40 +47,24 @@ public class MainPanel extends JPanel implements MouseListener {
         return (int) Math.round((Math.random() * maxRange));
     }
 
-    public MainPanel(int width, int height) {
-
-        SCREEN_HEIGHT = height;
-        SCREEN_WIDTH = width;
-        
+    public MainPanel() {
         container = new CustomContainer(SCREEN_HEIGHT, SCREEN_WIDTH);
-
-        pArea = new PaintArea(width, height, container);
+        pArea = new PaintArea(SCREEN_WIDTH, SCREEN_HEIGHT, container);
         this.setLayout(new BorderLayout());
         this.add(pArea, BorderLayout.CENTER);
         this.addMouseListener(this);
-        for(int i=0;i<(SCREEN_WIDTH/(CONTAINER_LENGTH * 20) + 1);i++) {
-        	for(int j=0; j<2;j++) {
-//        		field[i][0][j] = -1; 
-        	}
-        }
-      
         start();
-
     }
 
     public void start() {
-
         Thread t = new Thread() {
             public void run() {
-
                 while (true) {
-
                     update();
                     repaint();
                     try {
                         Thread.sleep(1000 / UPDATE_RATE);
-                    } catch (InterruptedException e) {
-                    }
+                    } catch (InterruptedException e) { }
                 }
             }
         };
@@ -89,18 +72,7 @@ public class MainPanel extends JPanel implements MouseListener {
     }
 
     public void update() {
-//    	for(int i=0;i<MAX_NUMBER_OF_BLOCKS;i++) {
-//    		if(blocks[i] != null) {
-//    			if(blocks[i].x < SCREEN_WIDTH) {
-//    				blocks[i].move(container);
-//    			} else if (blocks[i].inactiveTime < 10) {
-//    				blocks[i].inactiveTime++;
-//    				blocks[i].releaseAll();
-//    			} else {
-//    				blocks[i] = null;
-//    			}
-//    		}
-//    	}
+    	pArea.moveShips();
     	pArea.moveCrane();
     }
       
@@ -119,7 +91,6 @@ public class MainPanel extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-    	System.out.println("Mouse pressed!");
    		pArea.addShip();
     }
 

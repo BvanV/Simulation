@@ -4,20 +4,23 @@ import java.awt.Graphics;
 
 
 public class newShip extends newBlock {
+	private static final long serialVersionUID = 6494552242026331765L;
 	private int xsize;
 	private int ysize;
 	private int destX;
 	private newTFE[] blokjes;
 	private int status;
 	private int size;
+	private int CONTAINER_WIDTH 	= MainPanel.CONTAINER_WIDTH;
+	private int CONTAINER_LENGTH	= MainPanel.CONTAINER_LENGTH;
 	
 	final int SH_WAITING 	= 0;
 	final int SH_MOVING 	= 1;
 	
 	public newShip(int ind, int pYsize, int pXsize, int len, int wid, int ypos, int destinX) {
 		super();
-    	ysize	= 2 + random(3);
-    	xsize	= 2*ysize + random(2);
+    	ysize	= pYsize;
+    	xsize	= pXsize;
 		size	= xsize * ysize;
         speedX 	= 10;
         speedY 	= 0;
@@ -35,9 +38,9 @@ public class newShip extends newBlock {
         blokjes = new newTFE[xsize*ysize];
         for(int i=0;i<ysize;i++) {
         	for(int j=0;j<xsize;j++) {
-        		blokjes[i*xsize + j] = new newTFE(i*xsize + j, MainPanel.CONTAINER_WIDTH, MainPanel.CONTAINER_LENGTH);
-        		blokjes[i*xsize + j].setX(x + (MainPanel.CONTAINER_LENGTH / 2) + j * MainPanel.CONTAINER_LENGTH);
-        		blokjes[i*xsize + j].setY(y + (MainPanel.CONTAINER_WIDTH / 2) + i * MainPanel.CONTAINER_WIDTH);
+        		blokjes[i*xsize + j] = new newTFE(i*xsize + j, CONTAINER_WIDTH, CONTAINER_LENGTH);
+        		blokjes[i*xsize + j].setX(x + (CONTAINER_LENGTH / 2) + j * CONTAINER_LENGTH);
+        		blokjes[i*xsize + j].setY(y + (CONTAINER_WIDTH / 2) + i * CONTAINER_WIDTH);
         	}
         }
     }
@@ -60,9 +63,10 @@ public class newShip extends newBlock {
     public void move(CustomContainer container) {
     	if(status == SH_MOVING) {
     		if(x + speedX > destX) {
-//    			moveContainers(destX - x, 0, container);
+    			moveContainers(destX - x, 0, container);
     			x = destX;
     		} else {
+    			moveContainers(speedX, 0, container);
     			x += speedX;
     		}
     	}

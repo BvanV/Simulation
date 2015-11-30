@@ -1,10 +1,11 @@
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Graphics;
 
 public class newTFE extends newBlock {
-   
-    public newTFE() {}
+
+	private static final long serialVersionUID = -4011709659923809368L;
+
+	public newTFE() {}
     
     /**
      * used for containers on a ship
