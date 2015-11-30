@@ -1,5 +1,4 @@
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Graphics;
 
 import javax.swing.JPanel;
@@ -18,11 +17,26 @@ public class newBlock extends JPanel {
     protected int blue;
     protected int index;
     protected int inactiveTime; // wait some time before removing.
-    
-    //a block can be a ship, it then contains other blocks
-    protected int size = 0;
-    newTFE[] blokjes;
+//    
+//    //a block can be a ship, it then contains other blocks
+//    protected int size = 0;
+//    newTFE[] blokjes;
     
     public newBlock() {}
-
+    
+    public newBlock(int x, int y, int w, int h, int r, int g, int b) {
+    	this.x 	= x;
+    	this.y 	= y;
+    	width 	= w;
+    	heigth 	= h;
+    	red 	= r;
+    	green 	= g;
+    	blue 	= b;
+    }
+ 
+    public void draw(Graphics g) {
+        g.setColor(new Color(red, green, blue));
+        g.fillRect(x, y, width, heigth);
+    }
+    
 }

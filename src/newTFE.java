@@ -45,7 +45,7 @@ public class newTFE extends newBlock {
     public void releaseReservedSpace() {
     }
     
-    public void move(int Xdist, int Ydist, MainPanel.Container container) { 
+    public void move(int Xdist, int Ydist, CustomContainer container) { 
     	x += Xdist;
     	y += Ydist;
     }

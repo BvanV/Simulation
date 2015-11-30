@@ -1,18 +1,15 @@
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Graphics;
 
 
 
 public class newShip extends newBlock {
-	int xsize;
-	int ysize;
-	int destX;
-	boolean done;
-	int tempCounter;
-	newTFE[] blokjes;
-	int status;
-	int moveLimit;
+	private int xsize;
+	private int ysize;
+	private int destX;
+	private newTFE[] blokjes;
+	private int status;
+	private int size;
 	
 	final int SH_WAITING 	= 0;
 	final int SH_MOVING 	= 1;
@@ -28,11 +25,9 @@ public class newShip extends newBlock {
         green 	= 160;
         blue 	= 160;
         index	= ind;
-        done	= false;
-        tempCounter = 0;
         width 	= len;
         heigth 	= wid;
-    	x 		= 0 - width;
+    	x 		= 0;
     	y 		= ypos;
     	destX	= destinX;
     	status	= SH_MOVING;
@@ -51,10 +46,21 @@ public class newShip extends newBlock {
         return (int) Math.round(Math.random() * maxRange);
     }
     
-    public void move(MainPanel.Container container) {
+	public int getShipSize() {
+		return this.size;
+	}
+	
+	public newTFE getTFE(int index) {
+		if(index < blokjes.length) {
+			return blokjes[index];
+		}
+		return null;
+	}
+	
+    public void move(CustomContainer container) {
     	if(status == SH_MOVING) {
     		if(x + speedX > destX) {
-    			moveContainers(destX - x, 0, container);
+//    			moveContainers(destX - x, 0, container);
     			x = destX;
     		} else {
     			x += speedX;
@@ -99,7 +105,7 @@ public class newShip extends newBlock {
      * @param Xdist vertical distance, positive means to the right
      * @param Ydist vertical distance, positive means going down.
      */
-    private void moveContainers(int Xdist, int Ydist, MainPanel.Container container) {
+    private void moveContainers(int Xdist, int Ydist, CustomContainer container) {
     	for(int i=0;i<size;i++) {
     		if(blokjes[i] != null) {
     			blokjes[i].move(Xdist, 0, container);
