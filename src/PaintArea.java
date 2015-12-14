@@ -1,13 +1,19 @@
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 class PaintArea extends JPanel {
 
 	private static final long serialVersionUID = 7471887303263865455L;
 	private CustomContainer container;
+	private JLabel label;
+	private String[] logText;
+	private String LOG_TEXT_HEADER = "Control log"; 
+	private int LOG_SIZE = 10;
 	private Block water;
 	private Field containerField;
     private int canvasWidth;
@@ -27,19 +33,29 @@ class PaintArea extends JPanel {
     	canvasWidth 	= w;
     	canvasHeight 	= h;
     	container 		= c;
+    	logText 		= new String[10];
+    	for(int i=0;i<LOG_SIZE;i++) {
+    		logText[i] = "";
+    	}
     	
     	//TODO remove magic numbers
+    	this.setLayout(null);
     	water = new Block(0,0,w,WATER_HEIGHT,51,153,255);
     	containerField = new Field(CONTAINER_FIELD_OFFSET, WATER_HEIGHT,200, 500, 255, 204, 153, 4, 50);
     	cranes = new Crane[1];
     	cranes[0] = new Crane(0, CONTAINER_FIELD_OFFSET + 20, WATER_HEIGHT + 10 * CONTAINER_WIDTH);
     	ships = new Ship[MAX_NUMBER_OF_BLOCKS];
+    	label = new JLabel("<html><h2>"+LOG_TEXT_HEADER+"</h2></html>");
+    	label.setBounds(50, 400, 300, 300);  
+    	this.add(label);
+    	
+    	
     }
 
     /**
      * Add a Ship to the panel
      */
-    public void addShip() {
+    public ShipMessage addShip() {
 		int i = 0;
 		boolean done = false;
 		while(i<MAX_NUMBER_OF_BLOCKS && !done) {
@@ -55,7 +71,28 @@ class PaintArea extends JPanel {
 			}
 			i++;
 		}
-
+		if(done) {
+			return new ShipMessage(i-1, true, false, -1, -1);
+		}
+		return null;
+    }
+    
+    /**
+     * Add a new log text to the Control log.
+     * @param log
+     */
+    public void addNewLogText(String log) {
+    	// shift the log texts
+    	for(int i=LOG_SIZE-1; i>0; i--) {
+    		logText[i] = logText[i-1];
+    	}
+    	logText[0] = log;
+    	String newText = "<html><h2>" + LOG_TEXT_HEADER + "</h2><br>";
+    	for(int i=0;i<LOG_SIZE;i++) {
+    		newText = newText + logText[i] + "<br>";
+    	}
+    	newText = newText + "</html>";
+    	label.setText(newText);
     }
     
     /**

@@ -210,7 +210,7 @@ public class Crane extends Block {
      */
     public void applyJob() {
     	destYCrane 	= WATER_HEIGHT + CONTAINER_WIDTH;
-    	destXCrane 	= CONTAINER_FIELD_OFFSET + (currentJob.getTFEOnBoardX() * CONTAINER_WIDTH);
+    	destXCrane 	= CONTAINER_FIELD_OFFSET + (currentJob.getTFEOnBoardX() * CONTAINER_LENGTH);
     	ysize		= currentJob.getShipYSize();
     	destYRod	= WATER_HEIGHT - ysize * CONTAINER_WIDTH + CONTAINER_WIDTH/2 + currentJob.getTFEOnBoardY() * CONTAINER_WIDTH;
 		craneStatus = CR_MOVE_TO_COAST;

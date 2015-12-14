@@ -85,13 +85,36 @@ public class MainPanel extends JPanel implements MouseListener {
     		for(int i=0; i<sms.length;i++) {
     			Crane[] cs = pArea.getCranes();
     			if(cs != null && sms[i] != null) {
-    				cs[0].addJob(new CraneJob(sms[i].getShipIndex(),
-    						pArea.getShips()[sms[i].getShipIndex()].getYsize(),0,0,0,0));
+        			pArea.addNewLogText(getShipLogMessage(sms[i]));
+        			CraneJob cj = new CraneJob(sms[i].getShipIndex(),
+    											pArea.getShips()[sms[i].getShipIndex()].getYsize(),
+    											sms[i].getRmTFEX(),
+    											sms[i].getRmTFEX(),
+    											0,0); 
+    				cs[0].addJob(cj);
+    				pArea.addNewLogText(getCraneLogMessage(cj));
     			}
     		}
     	}
     }
     
+    public String getCraneLogMessage(CraneJob c) {
+    	return "Kraan 0: Los schip " + c.getShipIndex() + ": "
+    			+ "verplaats container S("+ c.getTFEOnBoardX() + ", " + c.getTFEOnBoardY() + ") "
+    			+ "naar vak H(" + c.getTFEOnFieldX() + ", " + c.getTFEOnFieldY() +").";
+    }
+    
+    public String getShipLogMessage(ShipMessage s) {
+    	if(s.isRemoveTFE()) {
+    		return "Schip " + s.getShipIndex() + ": "
+    				+ "verwijder container met coordinaten " +
+    				"(" + s.getRmTFEX() + ", " + s.getRmTFEY() + ").";
+    	}
+    	if(s.isEntersArea()) {
+    		return "<b>Schip " + s.getShipIndex() + "</b> vaart de haven binnen.";
+    	}
+    	return "";
+    }
       
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -108,7 +131,10 @@ public class MainPanel extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-   		pArea.addShip();
+   		ShipMessage s = pArea.addShip();
+   		if(s != null) {
+   			pArea.addNewLogText(getShipLogMessage(s));
+   		}
     }
 
     @Override
