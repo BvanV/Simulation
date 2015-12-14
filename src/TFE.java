@@ -1,11 +1,11 @@
 import java.awt.Color;
 import java.awt.Graphics;
 
-public class newTFE extends newBlock {
+public class TFE extends Block {
 
 	private static final long serialVersionUID = -4011709659923809368L;
 
-	public newTFE() {}
+	public TFE() {}
     
     /**
      * used for containers on a ship
@@ -13,7 +13,7 @@ public class newTFE extends newBlock {
      * @param givenHeigth height
      * @param givenWidth width
      */
-    public newTFE(int index, int givenHeight, int givenWidth) {
+    public TFE(int index, int givenHeight, int givenWidth) {
         color	= random(7);
         width 	= givenWidth;
         heigth 	= givenHeight;

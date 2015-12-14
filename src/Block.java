@@ -3,7 +3,7 @@ import java.awt.Graphics;
 
 import javax.swing.JPanel;
 
-public class newBlock extends JPanel {
+public class Block extends JPanel {
 	private static final long serialVersionUID = -6358405159987809616L;
 	protected int x;
     protected int y;
@@ -23,9 +23,9 @@ public class newBlock extends JPanel {
 //    protected int size = 0;
 //    newTFE[] blokjes;
     
-    public newBlock() {}
+    public Block() {}
     
-    public newBlock(int x, int y, int w, int h, int r, int g, int b) {
+    public Block(int x, int y, int w, int h, int r, int g, int b) {
     	this.x 	= x;
     	this.y 	= y;
     	width 	= w;

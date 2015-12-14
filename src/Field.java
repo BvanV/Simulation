@@ -1,6 +1,6 @@
 
-public class newField extends newBlock {
-	private newTFE[][] blocks;
+public class Field extends Block {
+	private TFE[][] blocks;
 	//position of the next free place
 	private int nextFreeX = 0;
 	private int nextFreeY = 0;
@@ -8,18 +8,18 @@ public class newField extends newBlock {
 	private int ysize;
     	
     	
-	public newField(int x, int y) {
+	public Field(int x, int y) {
 		super();
 		xsize = x;
 		ysize = y;
-		blocks = new newTFE[x][y];
+		blocks = new TFE[x][y];
 	}
  
-    public newField(int px, int py, int pwidth, int pheigth, int pred, int pgreen, int pblue, int sizeOfX, int sizeOfY) {
+    public Field(int px, int py, int pwidth, int pheigth, int pred, int pgreen, int pblue, int sizeOfX, int sizeOfY) {
     	super();
 		xsize = sizeOfX;
 		ysize = sizeOfY;
-		blocks = new newTFE[xsize][ysize];        	
+		blocks = new TFE[xsize][ysize];        	
     	x 		= px;
         y 		= py;
         width 	= pwidth;
@@ -29,7 +29,7 @@ public class newField extends newBlock {
         blue 	= pblue;
     }
     	
-	public void addBlock(newTFE b) {
+	public void addBlock(TFE b) {
 		blocks[nextFreeX][nextFreeY] = b;
 		boolean done = false;
 		int i = 0;
@@ -47,11 +47,11 @@ public class newField extends newBlock {
 		}
 	}
 
-	public newTFE[][] getBlocks() {
+	public TFE[][] getBlocks() {
 		return blocks;
 	}
 
-	public void setBlocks(newTFE[][] blocks) {
+	public void setBlocks(TFE[][] blocks) {
 		this.blocks = blocks;
 	}
 

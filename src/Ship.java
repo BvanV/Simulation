@@ -3,12 +3,12 @@ import java.awt.Graphics;
 
 
 
-public class newShip extends newBlock {
+public class Ship extends Block {
 	private static final long serialVersionUID = 6494552242026331765L;
 	private int xsize;
 	private int ysize;
 	private int destX;
-	private newTFE[] blokjes;
+	private TFE[] blokjes;
 	private int status;
 	private int size;
 	private int CONTAINER_WIDTH 	= MainPanel.CONTAINER_WIDTH;
@@ -17,7 +17,7 @@ public class newShip extends newBlock {
 	final int SH_WAITING 	= 0;
 	final int SH_MOVING 	= 1;
 	
-	public newShip(int ind, int pYsize, int pXsize, int len, int wid, int ypos, int destinX) {
+	public Ship(int ind, int pYsize, int pXsize, int len, int wid, int ypos, int destinX) {
 		super();
     	ysize	= pYsize;
     	xsize	= pXsize;
@@ -35,10 +35,10 @@ public class newShip extends newBlock {
     	destX	= destinX;
     	status	= SH_MOVING;
         MaxSpeedX = (width / 10) * (random(5) + 1);
-        blokjes = new newTFE[xsize*ysize];
+        blokjes = new TFE[xsize*ysize];
         for(int i=0;i<ysize;i++) {
         	for(int j=0;j<xsize;j++) {
-        		blokjes[i*xsize + j] = new newTFE(i*xsize + j, CONTAINER_WIDTH, CONTAINER_LENGTH);
+        		blokjes[i*xsize + j] = new TFE(i*xsize + j, CONTAINER_WIDTH, CONTAINER_LENGTH);
         		blokjes[i*xsize + j].setX(x + (CONTAINER_LENGTH / 2) + j * CONTAINER_LENGTH);
         		blokjes[i*xsize + j].setY(y + (CONTAINER_WIDTH / 2) + i * CONTAINER_WIDTH);
         	}
@@ -53,24 +53,28 @@ public class newShip extends newBlock {
 		return this.size;
 	}
 	
-	public newTFE getTFE(int index) {
+	public TFE getTFE(int index) {
 		if(index < blokjes.length) {
 			return blokjes[index];
 		}
 		return null;
 	}
 	
-    public void move(CustomContainer container) {
+    public ShipMessage move(CustomContainer container) {
     	if(status == SH_MOVING) {
     		if(x + speedX > destX) {
     			moveContainers(destX - x, 0, container);
     			x = destX;
+    			status = SH_WAITING;
+    			ShipMessage sm = new ShipMessage(index, true, 1, 1);
+    			return sm;
     		} else {
     			moveContainers(speedX, 0, container);
     			x += speedX;
     		}
     	}
-    	
+    	return null;
+    }
     	
 //		if(!done) {
 //			reserveSpace();
@@ -102,7 +106,6 @@ public class newShip extends newBlock {
 //			}
 //			releaseSpace();
 //		}
-	}
 	
     /**
      * Move the containers on the ship
@@ -129,6 +132,78 @@ public class newShip extends newBlock {
         g.setColor(new Color(red, green, blue));
         g.fillRect(x, y, width, heigth);
     }
+
+	public int getXsize() {
+		return xsize;
+	}
+
+	public void setXsize(int xsize) {
+		this.xsize = xsize;
+	}
+
+	public int getYsize() {
+		return ysize;
+	}
+
+	public void setYsize(int ysize) {
+		this.ysize = ysize;
+	}
+
+	public int getDestX() {
+		return destX;
+	}
+
+	public void setDestX(int destX) {
+		this.destX = destX;
+	}
+
+	public TFE[] getBlokjes() {
+		return blokjes;
+	}
+
+	public void setBlokjes(TFE[] blokjes) {
+		this.blokjes = blokjes;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+	public void setSize(int size) {
+		this.size = size;
+	}
+
+	public int getCONTAINER_WIDTH() {
+		return CONTAINER_WIDTH;
+	}
+
+	public void setCONTAINER_WIDTH(int cONTAINER_WIDTH) {
+		CONTAINER_WIDTH = cONTAINER_WIDTH;
+	}
+
+	public int getCONTAINER_LENGTH() {
+		return CONTAINER_LENGTH;
+	}
+
+	public void setCONTAINER_LENGTH(int cONTAINER_LENGTH) {
+		CONTAINER_LENGTH = cONTAINER_LENGTH;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public int getSH_WAITING() {
+		return SH_WAITING;
+	}
+
+	public int getSH_MOVING() {
+		return SH_MOVING;
+	}
 	
 	/**
 	 * 

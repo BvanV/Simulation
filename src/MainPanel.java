@@ -31,17 +31,20 @@ import javax.swing.JPanel;
 public class MainPanel extends JPanel implements MouseListener {
 
 	private static final long serialVersionUID = -7593664380166699676L;
-	static final int SCREEN_WIDTH 			= 1800;
-	static final int SCREEN_HEIGHT 			= 1000;		
+
+	final static int SCREEN_WIDTH 			= 1800;
+	final static int SCREEN_HEIGHT 			= 1000;		
 	final static int CONTAINER_WIDTH 		= 8;
 	final static int CONTAINER_LENGTH 		= (CONTAINER_WIDTH * 6096) / 2438;
 	final static int WATER_HEIGHT			= 300;
 	final static int CONTAINER_FIELD_WIDTH 	= 4 * CONTAINER_LENGTH + 4 * CONTAINER_WIDTH;
 	final static int CONTAINER_FIELD_OFFSET	= SCREEN_WIDTH - CONTAINER_FIELD_WIDTH - (10 * CONTAINER_LENGTH);
+	final static int UPDATE_RATE 			= 30;
+	final static int MAX_NUMBER_OF_BLOCKS 	= 10;
 	
     private CustomContainer container;
     private PaintArea pArea;
-    public static final int UPDATE_RATE = 30;
+    
 
     public static int random(int maxRange) {
         return (int) Math.round((Math.random() * maxRange));
@@ -72,9 +75,23 @@ public class MainPanel extends JPanel implements MouseListener {
     }
 
     public void update() {
-    	pArea.moveShips();
+    	ShipMessage[] shmss = pArea.moveShips();
+    	sendNewCraneJobs(shmss);
     	pArea.moveCrane();
     }
+    
+    public void sendNewCraneJobs(ShipMessage[] sms) {
+    	if(sms != null) {
+    		for(int i=0; i<sms.length;i++) {
+    			Crane[] cs = pArea.getCranes();
+    			if(cs != null && sms[i] != null) {
+    				cs[0].addJob(new CraneJob(sms[i].getShipIndex(),
+    						pArea.getShips()[sms[i].getShipIndex()].getYsize(),0,0,0,0));
+    			}
+    		}
+    	}
+    }
+    
       
     @Override
     public void mouseClicked(MouseEvent e) {
