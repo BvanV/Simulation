@@ -72,7 +72,7 @@ class PaintArea extends JPanel {
 			i++;
 		}
 		if(done) {
-			return new ShipMessage(i-1, true, false, -1, -1);
+			return new ShipMessage(i-1, true, false, 0, -1, -1);
 		}
 		return null;
     }

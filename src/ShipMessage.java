@@ -3,13 +3,15 @@ public class ShipMessage {
 	int shipIndex;
 	boolean entersArea;
 	boolean removeTFE;
+	int xPos;
 	int rmTFEX;
 	int rmTFEY;
 	
-	public ShipMessage(int index, boolean enter, boolean rmTFE, int x, int y) {
+	public ShipMessage(int index, boolean enter, boolean rmTFE, int xPosition, int x, int y) {
 		shipIndex 	= index;
 		entersArea	= enter;
 		removeTFE 	= rmTFE;
+		xPos		= xPosition;
 		rmTFEX 		= x;
 		rmTFEY		= y;
 	}

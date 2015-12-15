@@ -41,9 +41,12 @@ public class MainPanel extends JPanel implements MouseListener {
 	final static int CONTAINER_FIELD_OFFSET	= SCREEN_WIDTH - CONTAINER_FIELD_WIDTH - (10 * CONTAINER_LENGTH);
 	final static int UPDATE_RATE 			= 30;
 	final static int MAX_NUMBER_OF_BLOCKS 	= 10;
+	final private int[] LOSS_LOC_OFFSET		= new int[]{200, 600, 1000, CONTAINER_FIELD_OFFSET};
 	
     private CustomContainer container;
     private PaintArea pArea;
+    private WaterSpace waterSpace;
+    private int[] lossLocation;
     
 
     public static int random(int maxRange) {
@@ -51,6 +54,11 @@ public class MainPanel extends JPanel implements MouseListener {
     }
 
     public MainPanel() {
+    	lossLocation = new int[4];
+    	for(int i=0;i<4;i++) {
+    		lossLocation[i] = -1;
+    	}
+    	waterSpace = new WaterSpace(null, null, SCREEN_WIDTH);
         container = new CustomContainer(SCREEN_HEIGHT, SCREEN_WIDTH);
         pArea = new PaintArea(SCREEN_WIDTH, SCREEN_HEIGHT, container);
         this.setLayout(new BorderLayout());
@@ -75,16 +83,54 @@ public class MainPanel extends JPanel implements MouseListener {
     }
 
     public void update() {
+    	setShipDestinations();
     	ShipMessage[] shmss = pArea.moveShips();
     	sendNewCraneJobs(shmss);
     	pArea.moveCrane();
+    }
+    
+    /**
+     * Prevent ships from collisions
+     */
+    public void setShipDestinations() {
+    	Ship[] ships = pArea.getShips();
+    	for(int i=0;i<ships.length;i++) {
+    		if(ships[i] != null) {
+	    		int lossLoc = getLossLocation(i);
+	    		int prevX = 0;
+	    		if(lossLoc < 3) {
+	    			if(lossLocation[lossLoc + 1] >= 0 && ships[lossLocation[lossLoc + 1]] != null) {
+	    				prevX = ships[lossLocation[lossLoc + 1]].getX();
+	    			}
+	    		} else {
+	    			prevX = SCREEN_WIDTH * 2; 
+	    		}
+	    		int xLossPlace;
+	    		if(lossLoc < 0) {
+	    			xLossPlace = 0;
+	    		} else {
+	    			xLossPlace = LOSS_LOC_OFFSET[lossLoc];
+	    		}
+	    		int destShip = Math.min(prevX, xLossPlace);
+	    		ships[i].setDestX(destShip);
+    		}
+    	}
+    }
+    
+    public int getLossLocation(int index) {
+    	for(int i=0;i<4;i++) {
+    		if(lossLocation[i] == index) {
+    			return i;
+    		}
+    	}
+    	return -1;
     }
     
     public void sendNewCraneJobs(ShipMessage[] sms) {
     	if(sms != null) {
     		for(int i=0; i<sms.length;i++) {
     			Crane[] cs = pArea.getCranes();
-    			if(cs != null && sms[i] != null) {
+    			if(cs != null && sms[i] != null && sms[i].isRemoveTFE()) {
         			pArea.addNewLogText(getShipLogMessage(sms[i]));
         			CraneJob cj = new CraneJob(sms[i].getShipIndex(),
     											pArea.getShips()[sms[i].getShipIndex()].getYsize(),
@@ -115,7 +161,50 @@ public class MainPanel extends JPanel implements MouseListener {
     	}
     	return "";
     }
-      
+    
+    /**
+     * Keep track of the position of the current ship
+     * @param s
+     */
+    public void addWaterSpaceShip(Ship s) {
+    	WaterSpace w = new WaterSpace(s, waterSpace, s.getX() + s.getWidth());
+    	waterSpace.setLeft(w);
+    }
+    
+    /**
+     * add free space after the last ship
+     * @param s the last ship entered
+     */
+    public void addWaterSpaceFree(Ship s) {
+    	WaterSpace w = new WaterSpace(null, waterSpace, s.getX());
+    	waterSpace.setLeft(w);
+    }
+    
+    /**
+     * Tries to add ship, if this is possible
+     * @return whether a ship is added
+     */
+    public boolean addShip() {
+    	if(lossLocation[0] != -1) {
+    		return false;
+    	}
+    	ShipMessage s = pArea.addShip();
+   		if(s != null) {
+   			boolean done = false;
+   			int i = 3;
+   			while(!done && i >= 0) {
+   				if(lossLocation[i] == -1) {
+   					lossLocation[i] = s.getShipIndex();
+   					done = true;
+   				}
+   				i--;
+   			}
+   			pArea.addNewLogText(getShipLogMessage(s));
+   			addWaterSpaceShip(pArea.getShips()[s.getShipIndex()]);
+   		}
+    	return true;
+    }
+    
     @Override
     public void mouseClicked(MouseEvent e) {
         // TODO Auto-generated method stub
@@ -131,10 +220,7 @@ public class MainPanel extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-   		ShipMessage s = pArea.addShip();
-   		if(s != null) {
-   			pArea.addNewLogText(getShipLogMessage(s));
-   		}
+    	addShip();
     }
 
     @Override

@@ -66,14 +66,14 @@ public class Ship extends Block {
     			moveContainers(destX - x, 0, container);
     			x = destX;
     			status = SH_WAITING;
-    			ShipMessage sm = new ShipMessage(index, false, true, 1, 1);
+    			ShipMessage sm = new ShipMessage(index, false, true, x, 1, 1);
     			return sm;
     		} else {
     			moveContainers(speedX, 0, container);
     			x += speedX;
     		}
     	}
-    	return null;
+    	return new ShipMessage(index, false, false, x, -1, -1);
     }
     	
 //		if(!done) {
