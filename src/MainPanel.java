@@ -41,10 +41,11 @@ public class MainPanel extends JPanel implements MouseListener {
 	final static int CONTAINER_FIELD_OFFSET	= SCREEN_WIDTH - CONTAINER_FIELD_WIDTH - (10 * CONTAINER_LENGTH);
 	final static int UPDATE_RATE 			= 30;
 	final static int MAX_NUMBER_OF_BLOCKS 	= 10;
+	final static int MIN_SHIP_DISTANCE  	= 2 * CONTAINER_LENGTH;
 	final private int[] LOSS_LOC_OFFSET		= new int[]{200, 600, 1000, CONTAINER_FIELD_OFFSET};
 	
     private CustomContainer container;
-    private PaintArea pArea;
+    PaintArea pArea;
     private WaterSpace waterSpace;
     private int[] lossLocation;
     
@@ -64,29 +65,6 @@ public class MainPanel extends JPanel implements MouseListener {
         this.setLayout(new BorderLayout());
         this.add(pArea, BorderLayout.CENTER);
         this.addMouseListener(this);
-        start();
-    }
-
-    public void start() {
-        Thread t = new Thread() {
-            public void run() {
-                while (true) {
-                    update();
-                    repaint();
-                    try {
-                        Thread.sleep(1000 / UPDATE_RATE);
-                    } catch (InterruptedException e) { }
-                }
-            }
-        };
-        t.start();
-    }
-
-    public void update() {
-    	setShipDestinations();
-    	ShipMessage[] shmss = pArea.moveShips();
-    	sendNewCraneJobs(shmss);
-    	pArea.moveCrane();
     }
     
     /**
@@ -130,7 +108,7 @@ public class MainPanel extends JPanel implements MouseListener {
     	if(sms != null) {
     		for(int i=0; i<sms.length;i++) {
     			Crane[] cs = pArea.getCranes();
-    			if(cs != null && sms[i] != null && sms[i].isRemoveTFE()) {
+    			if(cs != null && sms[i] != null && sms[i].isRemoveTFE() && sms[i].getShipIndex() == lossLocation[3] ) {
         			pArea.addNewLogText(getShipLogMessage(sms[i]));
         			CraneJob cj = new CraneJob(sms[i].getShipIndex(),
     											pArea.getShips()[sms[i].getShipIndex()].getYsize(),
@@ -181,11 +159,26 @@ public class MainPanel extends JPanel implements MouseListener {
     }
     
     /**
+     * @return whether it is possible to add a new ship
+     */
+    public boolean canAddShip() {
+    	for(int i=0;i<4;i++) {
+    		if(lossLocation[i] != -1) {
+    			if(pArea.getShips()[lossLocation[i]].getX() < MIN_SHIP_DISTANCE) {
+    				return false;
+    			}
+    		}
+    	}
+    	return true;
+    }
+    
+    /**
      * Tries to add ship, if this is possible
      * @return whether a ship is added
      */
     public boolean addShip() {
-    	if(lossLocation[0] != -1) {
+    	pArea.addNewLogText("Nieuw schip verzoekt toegang");
+    	if(lossLocation[0] != -1 || !canAddShip()) {
     		return false;
     	}
     	ShipMessage s = pArea.addShip();

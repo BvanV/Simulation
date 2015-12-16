@@ -30,7 +30,7 @@ public class Ship extends Block {
         index	= ind;
         width 	= len;
         heigth 	= wid;
-    	x 		= 0;
+    	x 		= 0 - width;
     	y 		= ypos;
     	destX	= destinX;
     	status	= SH_MOVING;
