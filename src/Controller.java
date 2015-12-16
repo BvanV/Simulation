@@ -50,9 +50,9 @@ public class Controller {
     		mp.setMousePressed(false);
     	}
     	setShipDestinations();
-    	ShipMessage[] shmss = mp.pArea.moveShips();
+    	ShipMessage[] shmss = mp.moveShips();
     	sendNewCraneJobs(shmss);
-    	mp.pArea.moveCrane();
+    	mp.moveCrane();
     }
     
     public static int random(int maxRange) {
@@ -63,7 +63,7 @@ public class Controller {
      * Prevent ships from collisions
      */
     public void setShipDestinations() {
-    	Ship[] ships = mp.pArea.getShips();
+    	Ship[] ships = mp.getShips();
     	for(int i=0;i<ships.length;i++) {
     		if(ships[i] != null) {
 	    		int lossLoc = getLossLocation(i);
@@ -99,16 +99,16 @@ public class Controller {
     public void sendNewCraneJobs(ShipMessage[] sms) {
     	if(sms != null) {
     		for(int i=0; i<sms.length;i++) {
-    			Crane[] cs = mp.pArea.getCranes();
+    			Crane[] cs = mp.getCranes();
     			if(cs != null && sms[i] != null && sms[i].isRemoveTFE() && sms[i].getShipIndex() == lossLocation[3] ) {
-        			mp.pArea.addNewLogText(getShipLogMessage(sms[i]));
+        			mp.addNewLogText(getShipLogMessage(sms[i]));
         			CraneJob cj = new CraneJob(sms[i].getShipIndex(),
-    											mp.pArea.getShips()[sms[i].getShipIndex()].getYsize(),
+    											mp.getShips()[sms[i].getShipIndex()].getYsize(),
     											sms[i].getRmTFEX(),
     											sms[i].getRmTFEX(),
     											0,0); 
     				cs[0].addJob(cj);
-    				mp.pArea.addNewLogText(getCraneLogMessage(cj));
+    				mp.addNewLogText(getCraneLogMessage(cj));
     			}
     		}
     	}
@@ -139,7 +139,7 @@ public class Controller {
     public boolean canAddShip() {
     	for(int i=0;i<4;i++) {
     		if(lossLocation[i] != -1) {
-    			if(mp.pArea.getShips()[lossLocation[i]].getX() < MIN_SHIP_DISTANCE) {
+    			if(mp.getShips()[lossLocation[i]].getX() < MIN_SHIP_DISTANCE) {
     				return false;
     			}
     		}
@@ -152,11 +152,11 @@ public class Controller {
      * @return whether a ship is added
      */
     public boolean addShip() {
-    	mp.pArea.addNewLogText("Nieuw schip verzoekt toegang");
+    	mp.addNewLogText("Nieuw schip verzoekt toegang");
     	if(lossLocation[0] != -1 || !canAddShip()) {
     		return false;
     	}
-    	ShipMessage s = mp.pArea.addShip();
+    	ShipMessage s = mp.addShip();
    		if(s != null) {
    			boolean done = false;
    			int i = 3;
@@ -167,7 +167,7 @@ public class Controller {
    				}
    				i--;
    			}
-   			mp.pArea.addNewLogText(getShipLogMessage(s));
+   			mp.addNewLogText(getShipLogMessage(s));
    		}
     	return true;
     }
