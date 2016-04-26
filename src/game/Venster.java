@@ -40,6 +40,10 @@ public class Venster extends JFrame {
 		this.setVisible(true);
 		tabbedPane.setSelectedIndex(0);
 	}
+	
+	public void addBusStop(int index, BusStop busStop) {
+		gamePanel.addBusStop(index, busStop);
+	}
 
 	public void moveToTab(int tab) {
 		tabbedPane.setSelectedIndex(tab);
