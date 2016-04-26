@@ -46,7 +46,7 @@ public class TFE extends Block {
     public void releaseReservedSpace() {
     }
     
-    public void move(int Xdist, int Ydist, CustomContainer container) { 
+    public void move(int Xdist, int Ydist) { 
     	x += Xdist;
     	y += Ydist;
     }

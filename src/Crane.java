@@ -4,11 +4,11 @@ import java.awt.Graphics;
 
 
 public class Crane extends Block {
-	private static final long serialVersionUID = -9076651078827732361L;
-	private int CONTAINER_LENGTH 		= MainPanel.CONTAINER_LENGTH;
-	private int CONTAINER_WIDTH 		= MainPanel.CONTAINER_WIDTH;
-	private int WATER_HEIGHT 			= MainPanel.WATER_HEIGHT;
-	private int CONTAINER_FIELD_OFFSET	= MainPanel.CONTAINER_FIELD_OFFSET;
+	private static final long serialVersionUID 	= -9076651078827732361L;
+	private final int CONTAINER_LENGTH 			= Controller.CONTAINER_LENGTH;
+	private final int CONTAINER_WIDTH 			= Controller.CONTAINER_WIDTH;
+	private final int WATER_HEIGHT 				= Controller.WATER_HEIGHT;
+	private final int CONTAINER_FIELD_OFFSET	= Controller.CONTAINER_FIELD_OFFSET;
 
 	
 	Block[] parts;
@@ -18,10 +18,12 @@ public class Crane extends Block {
 	CraneJob currentJob;
 	int craneStatus;
 	int ShipToHandle;
+	Ship currentShip;
 	int leftRow;		// index of left most row currently in scope
 	int ysize;
 	int xsize;
 	TFE currentContainer;
+	Field containerField;
 	boolean hasContainer = false;
 	int indexCurrentContainer = -1;		// TEMP VALUE
 	int containerOriginXpos;		// 'Row' on the ship
@@ -41,10 +43,14 @@ public class Crane extends Block {
 	final int CR_MOVE_ALONG_COAST_TO_TFE	= 2;
 	final int CR_MOVE_ROD_TO_TFE_ON_SHIP	= 3;
 	
-	final int CR_REMOVE_TFE_FROM_SHIP		= 4;
-	final int CR_MOVE_ALONG_COAST_TO_FIELD	= 5;
-	final int CR_MOVE_TFE_TO_FIELD_POS		= 6;
-	final int CR_MOVING 				= 99;
+	final int CR_TAKE_TFE_FROM_SHIP			= 4;
+	
+	final int CR_REMOVE_TFE_FROM_SHIP		= 5;
+	final int CR_LEAVE_SHIP					= 6;
+	final int CR_MOVE_ALONG_COAST_TO_FIELD	= 7;
+	final int CR_MOVE_TFE_TO_FIELD_POS		= 8;
+	final int CR_RELEASE_TFE_ON_FIELD		= 9;
+	final int CR_MOVING 					= 99;
 	
 	
 	public Crane(int ind, int x, int y) {
@@ -152,40 +158,100 @@ public class Crane extends Block {
 	 * Prepare the move and call the moveCrane method
 	 * @param container
 	 */
-    public void move(CustomContainer container) {
+    public CraneMessage move() {
     	//Decide what to do;
     	if(craneStatus == CR_WAITING) {
     		if(currentJob != null) {
     			applyJob();
+    			return null;
     		}
     	}
     	if(craneStatus == CR_MOVE_TO_COAST) {
     		if(y != destYCrane) {
-    			moveCrane(container);
+    			moveCrane();
+    			return null;
     		} else {
     			craneStatus = CR_MOVE_ALONG_COAST_TO_TFE;
+    			return null;
     		}
     	} 
     	if(craneStatus == CR_MOVE_ALONG_COAST_TO_TFE) {
     		if(x != destXCrane) {
-    			moveCrane(container);
+    			moveCrane();
+    			return null;
     		} else {
     			craneStatus = CR_MOVE_ROD_TO_TFE_ON_SHIP;
+    			return null;
     		}
     	}
     	if(craneStatus == CR_MOVE_ROD_TO_TFE_ON_SHIP) {
     		if(parts[2].y > destYRod) {
-    			moveCrane(container);
+    			moveCrane();
+    			return null;
+    		} else {
+    			craneStatus = CR_TAKE_TFE_FROM_SHIP;
+    			return null;
     		}
     	}
-    		    	
+    	if(craneStatus == CR_TAKE_TFE_FROM_SHIP) {
+    		currentContainer = currentShip.removeTFE(currentJob.getTFEOnBoardX(), currentJob.getTFEOnBoardY());
+    		hasContainer = true;
+    		craneStatus = CR_REMOVE_TFE_FROM_SHIP;
+    		reApplyJob();
+    		return null;
+    	}
+    	if(craneStatus == CR_REMOVE_TFE_FROM_SHIP) {
+    		if(parts[2].y < destYRod) {
+    			moveCrane();
+    			return null;
+    		} else {
+    			craneStatus = CR_LEAVE_SHIP;
+    			return null;
+    		}
+    	}
+    	if(craneStatus == CR_LEAVE_SHIP) {
+    		if(y < WATER_HEIGHT + 10 * CONTAINER_WIDTH) {
+    			moveCrane();
+    			return null;
+    		} else {
+    			craneStatus = CR_MOVE_ALONG_COAST_TO_FIELD;
+    			return new CraneMessage(true, currentJob.getTFEOnBoardX(), currentJob.getTFEOnBoardY());
+    		}
+    	}
+    	if(craneStatus == CR_MOVE_ALONG_COAST_TO_FIELD) {
+    		if(x != destXCrane) {
+    			moveCrane();
+    			return null;
+    		} else {
+    			craneStatus = CR_MOVE_TFE_TO_FIELD_POS;
+    			return null;
+    		}
+    	}
+    	if(craneStatus == CR_MOVE_TFE_TO_FIELD_POS) {
+    		if(y < destYCrane) {
+    			moveCrane();
+    			return null;
+    		} else {
+    			craneStatus = CR_RELEASE_TFE_ON_FIELD;
+    			return null;
+    		}
+    	}	    	
+    	if(craneStatus == CR_RELEASE_TFE_ON_FIELD) {
+    		containerField.addTFE(currentJob.getTFEOnFieldX(), currentJob.getTFEOnFieldY(), currentContainer);
+    		currentContainer = null;
+    		hasContainer = false;
+    		currentJob = currentJob.getNextJob();
+    		craneStatus = CR_WAITING;
+    		return null;
+    	}
+    	return null;
     }
       
     /**
      * execute the actual move
      * @param container
      */
-    private void moveCrane(CustomContainer container) {
+    private void moveCrane() {
     	if(craneStatus == CR_MOVE_TO_COAST) {
     		if(y > destYCrane) {
     			moveVert(-1);
@@ -203,38 +269,50 @@ public class Crane extends Block {
     			moveRodVert(-1);
     		}
     	}
+    	if(craneStatus == CR_REMOVE_TFE_FROM_SHIP) {
+    		if(parts[2].y < destYRod) {
+    			moveRodVert(1);
+    		}
+    	}
+    	if(craneStatus == CR_LEAVE_SHIP) {
+    		if(y < WATER_HEIGHT + 10 * CONTAINER_WIDTH) {
+    			moveVert(1);
+    		}
+    	}
+    	if(craneStatus == CR_MOVE_ALONG_COAST_TO_FIELD) {
+    		if(x > destXCrane) {
+    			moveHoriz(-1);
+    		} else if(x < destXCrane) {
+    			moveHoriz(1);
+    		}
+    	}
+    	if(craneStatus == CR_MOVE_TFE_TO_FIELD_POS) {
+    		if(y < destYCrane) {
+    			moveVert(1);
+    		} 
+    	} 
 	}
 
     /**
      * start with a new job
      */
     public void applyJob() {
+    	currentShip	= currentJob.getShip();
     	destYCrane 	= WATER_HEIGHT + CONTAINER_WIDTH;
     	destXCrane 	= CONTAINER_FIELD_OFFSET + (currentJob.getTFEOnBoardX() * CONTAINER_LENGTH);
     	ysize		= currentJob.getShipYSize();
     	destYRod	= WATER_HEIGHT - ysize * CONTAINER_WIDTH + CONTAINER_WIDTH/2 + currentJob.getTFEOnBoardY() * CONTAINER_WIDTH;
 		craneStatus = CR_MOVE_TO_COAST;
-		if(currentJob != null) {
-			CraneJob next = currentJob.getNextJob();
-			currentJob = next;
-		}
     }
     
-	/**
-	 * Takes the container with index from ShipToHandle
-	 */
-	public void takeContainer(int index) {
-		hasContainer = true;
-	}
-	
-	/**
-	 * Releases the current container
-	 */
-	public void releaseContainer() {
-		currentContainer 		= null;
-		containerIsDone	= true;
-		hasContainer 	= false;				
-	}
+    public void reApplyJob() {
+    	if(craneStatus == CR_REMOVE_TFE_FROM_SHIP) {
+        	destYCrane 	= WATER_HEIGHT + 10 * CONTAINER_WIDTH + currentJob.getTFEOnFieldY() * CONTAINER_WIDTH;
+        	destXCrane 	= CONTAINER_FIELD_OFFSET + (currentJob.getTFEOnFieldX() * CONTAINER_LENGTH);
+        	destYRod	= WATER_HEIGHT;
+    		craneStatus = CR_REMOVE_TFE_FROM_SHIP;
+    	}
+    }
 			
 	/**
 	 * move the crane in vertical direction
@@ -316,6 +394,14 @@ public class Crane extends Block {
       	}
         
     }
+
+	public Field getContainerField() {
+		return containerField;
+	}
+
+	public void setContainerField(Field containerField) {
+		this.containerField = containerField;
+	}
 
 	
 }

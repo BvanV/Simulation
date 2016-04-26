@@ -7,9 +7,11 @@ public class CraneJob {
 	private int TFEOnBoardY;
 	private int TFEOnFieldX;
 	private int TFEOnFieldY;
+	private Ship ship;
 	
-	public CraneJob(int ship, int ysize, int onBoardX, int onBoardY, int onFieldX, int onFieldY) {
-		shipIndex 	= ship;
+	public CraneJob(Ship sh,int shipind, int ysize, int onBoardX, int onBoardY, int onFieldX, int onFieldY) {
+		ship		= sh;
+		shipIndex 	= shipind;
 		shipYSize	= ysize;
 		TFEOnBoardX = onBoardX;
 		TFEOnBoardY = onBoardY;
@@ -71,5 +73,13 @@ public class CraneJob {
 
 	public void setShipYSize(int shipYSize) {
 		this.shipYSize = shipYSize;
+	}
+
+	public Ship getShip() {
+		return ship;
+	}
+
+	public void setShip(Ship ship) {
+		this.ship = ship;
 	}
 }

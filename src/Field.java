@@ -1,6 +1,7 @@
 
 public class Field extends Block {
 	private TFE[][] blocks;
+	private boolean[][] reservations;
 	//position of the next free place
 	private int nextFreeX = 0;
 	private int nextFreeY = 0;
@@ -13,13 +14,15 @@ public class Field extends Block {
 		xsize = x;
 		ysize = y;
 		blocks = new TFE[x][y];
+		reservations = new boolean[x][y];
 	}
  
     public Field(int px, int py, int pwidth, int pheigth, int pred, int pgreen, int pblue, int sizeOfX, int sizeOfY) {
     	super();
 		xsize = sizeOfX;
 		ysize = sizeOfY;
-		blocks = new TFE[xsize][ysize];        	
+		blocks = new TFE[xsize][ysize];
+		reservations = new boolean[xsize][ysize];
     	x 		= px;
         y 		= py;
         width 	= pwidth;
@@ -28,15 +31,25 @@ public class Field extends Block {
         green 	= pgreen;
         blue 	= pblue;
     }
-    	
-	public void addBlock(TFE b) {
-		blocks[nextFreeX][nextFreeY] = b;
+	
+	public boolean reserveNext() {
+		if(nextFreeX == -1 || nextFreeY == -1) {
+			return false;
+		}
+		try {
+			reservations[nextFreeX][nextFreeY] = false;
+		} catch(Exception e) {}
+		updateNext();
+		return true;
+	}
+	
+	public void updateNext() {
 		boolean done = false;
 		int i = 0;
 		while(!done && i < ysize) {
 			int j = 0;
 			while(!done && j < xsize) {
-				if(blocks[j][i] == null) {
+				if(blocks[j][i] == null && !reservations[j][i]) {
 					nextFreeX = j;
 					nextFreeY = i;
 					done = true;
@@ -46,7 +59,18 @@ public class Field extends Block {
 			i++;
 		}
 	}
-
+	
+	public void addTFE(int x, int y, TFE t) {
+		blocks[x][y] = t;
+		reservations[x][y] = false;
+		updateNext();
+	}
+	
+	public TFE getTFE(int x, int y) {
+		return blocks[x][y];
+	}
+	
+	
 	public TFE[][] getBlocks() {
 		return blocks;
 	}
