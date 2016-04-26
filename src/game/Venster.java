@@ -1,3 +1,4 @@
+package game;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -16,13 +17,14 @@ public class Venster extends JFrame {
 	private final JTabbedPane tabbedPane = new JTabbedPane();
 	private final NewGamePanel newGamePanel;
 	private final GamePanel gamePanel;
-	private final JPanel scorePanel = new JPanel();
+	private final ShopPanel shopPanel;
 	private final TopScorePanel topScorePanel = new TopScorePanel();
 	
 	public Venster(String name, ActionListener a) {
 		super(name);
 		newGamePanel = new NewGamePanel(a);
 		gamePanel = new GamePanel(a);
+		shopPanel = new ShopPanel(a);
 		setSize(new Dimension(WIDTH, HEIGHT));
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		tabbedPane.addTab("Nieuw spel",null,newGamePanel, "Start nieuw spel");	
@@ -30,7 +32,7 @@ public class Venster extends JFrame {
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 		gamePanel.setVisible(false);
 
-		tabbedPane.addTab("Shop", null, scorePanel,"Shop");
+		tabbedPane.addTab("Shop", null, shopPanel,"Shop");
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 		tabbedPane.addTab("Topscores", null, topScorePanel,"Topscores");
 		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
@@ -56,11 +58,15 @@ public class Venster extends JFrame {
 	}
 
 	public JPanel getScorePanel() {
-		return scorePanel;
+		return shopPanel;
 	}
 
 	public TopScorePanel getTopScorePanel() {
 		return topScorePanel;
+	}
+
+	public ShopPanel getShopPanel() {
+		return shopPanel;
 	}
 
 }

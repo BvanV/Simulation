@@ -1,3 +1,4 @@
+package game;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -7,14 +8,17 @@ public class App implements Serializable, Runnable, ActionListener {
 	
 	private static final long serialVersionUID = -2720994541588677008L;
 	
+	
 	public static final int WAITING = 0;
 	public static final int DRIVING = 1;
 	public static final int LEAVE_BUS = 2;
 	public static final int ENTER_BUS = 3;
 	public static final int NUMBER_OF_STOPS = 2;
-	public static final int BUS_CAPACITY = 8;
+	public static final int BUS_SMALL_CAPACITY = 8;
+	
 	public static final int FUEL_USE_ON_TRIP = 10;
-	public static final int TANK_SIZE = 50;
+	public static final int[] TANK_SIZES = {50, 60, 70, 80};
+	public static final int[] TANK_UPGRADE_PRICES = {50, 75, 100};
 	public static final int CROSS_TIME = 3000;
 	public static final int INTERVAL_TIME = 10;
 	
@@ -27,15 +31,20 @@ public class App implements Serializable, Runnable, ActionListener {
 	private boolean tankTenLiterBtnPressed = false;
 	private boolean tankFiftyLiterBtnPressed = false;
 	private boolean goToShopBtnPressed = false;
+	private boolean upgradeTankBtnPressed = false;
+	private boolean resumeGameBtnPressed = false;
 	
 	private int money = 0;
 	private int fuel = 50_000;
+	private int score = 0;
+	private int tankSize = 0;
 	
 	public static final int[] xPositions = {40, 1600};
 	public static final int[] yPositions = {760, 760};
 	private int[] maxWaitingPeople = {100, 100};
 	private final Random rand = new Random();
 	
+	private boolean playing = false;
 	private int status = WAITING;
 	private int waitTimeLeft = 0;
 	private int peopleInBus = 0;
@@ -62,8 +71,9 @@ public class App implements Serializable, Runnable, ActionListener {
 		while(stop == false) {
 			checkInput();
 			runGame();	
-	        venster.getGamePanel().getMoneyLabel().setText("$ "+money);
-	        venster.getGamePanel().getFuelLabel().setText("l: "+fuel/1000);
+	        venster.getGamePanel().getMoneyLabel().setText("$ " + money);
+	        venster.getGamePanel().getFuelLabel().setText("l: " + fuel/1000);
+	        venster.getGamePanel().getScoreLbl().setText("Score: " + score);
 			try {
 				Thread.sleep(INTERVAL_TIME);
 			} catch (InterruptedException e) {}
@@ -77,26 +87,43 @@ public class App implements Serializable, Runnable, ActionListener {
 				venster.setTitle(venster.getNewGamePanel().getNewGameNameTextbox().getText());
 				venster.getNewGamePanel().getNewGameNameTextbox().setText("");
 				venster.moveToTab(1);
+				playing = true;
 			}
 			startNewGameBtnPressed = false;
-		} else if (tankTenLiterBtnPressed) {
+		} 
+		if (tankTenLiterBtnPressed) {
 			tank(10,10);
 			tankTenLiterBtnPressed = false;
-		} else if (tankFiftyLiterBtnPressed) {
+		} 
+		if (tankFiftyLiterBtnPressed) {
 			tank(50, 45);
 			tankFiftyLiterBtnPressed = false;
-		} else if (goToShopBtnPressed) {
+		} 
+		if (goToShopBtnPressed) {
+			playing = false;
 			venster.moveToTab(2);
 			goToShopBtnPressed = false;
+		} 
+		if(upgradeTankBtnPressed) {
+			upgradeTank();
+			upgradeTankBtnPressed = false;
+		}
+		if(resumeGameBtnPressed) {
+			venster.moveToTab(1);
+			playing = true;
+			resumeGameBtnPressed = false;
 		}
 	}
 	
 	public void runGame() {
+		if(!playing) {
+			return;
+		}
 		if(waitTimeLeft > 0) {
 			waitTimeLeft -= INTERVAL_TIME;
 		} else {
-			switch(status) {
-				case WAITING 	: busWait();	break;										
+			switch(status) {			
+				case WAITING	: busWait();	break;
 				case DRIVING 	: moveBus();	break;
 				case LEAVE_BUS	: leaveBus();	break;
 				case ENTER_BUS 	: enterBus();	break;
@@ -109,17 +136,17 @@ public class App implements Serializable, Runnable, ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource().equals(venster.getNewGamePanel().getNewGameStartButton())) {
-			System.out.println("start");
 			startNewGameBtnPressed = true;
 		} else if(e.getSource().equals(venster.getGamePanel().getTankTenliterBtn())) {
-			System.out.println("10l");
 			tankTenLiterBtnPressed = true;
 		} else if(e.getSource().equals(venster.getGamePanel().getTankFiftyliterBtn())) {
-			System.out.println("50l");
 			tankFiftyLiterBtnPressed = true;
 		} else if(e.getSource().equals(venster.getGamePanel().getGoToShopBtn())) {
-			System.out.println("go2shop");
 			goToShopBtnPressed = true;
+		} else if(e.getSource().equals(venster.getShopPanel().getUpgradeTankBtn())) {
+			upgradeTankBtnPressed = true;
+		} else if(e.getSource().equals(venster.getShopPanel().getResumeGameBtn())) {
+			resumeGameBtnPressed = true;
 		} else {
 			System.out.println("unknown action recorded on "+ venster.getTitle());
 			System.out.println(e);
@@ -137,15 +164,14 @@ public class App implements Serializable, Runnable, ActionListener {
 	
     
 	public void tank(int liters, int price) {
-		if(money >= price) {
-			money -= price;
-			fuel = Math.min(TANK_SIZE * 1_000, fuel + liters * 1_000);
+		if(useMoney(price)) {
+			fuel = Math.min(TANK_SIZES[tankSize] * 1_000, fuel + liters * 1_000);
 		}
 	}
 	
-	public void busWait() {
+	public void busWait() {	
 		waitTimeLeft += 2000;
-		status = ENTER_BUS;
+		status = DRIVING;
 	}
 	
 	/**
@@ -174,16 +200,40 @@ public class App implements Serializable, Runnable, ActionListener {
 	}
 	
 	public void leaveBus() {
-		money += peopleInBus * 2;
+		addMoney(peopleInBus * 2);
 		peopleInBus = 0;
 		status = ENTER_BUS;
 		waitTimeLeft += 1000;
 	}
 	
+	/**
+	 * Adds money and updates the score if neccessary
+	 * @param amount
+	 */
+	public void addMoney(int amount) {
+		money += amount;
+		if(money > score) {
+			score = money;
+		}
+	}
+	
+	/**
+	 * checks if there is enough money, and subtract if possible
+	 * @param amount request use of money
+	 * @return true iff there is enough money, and the amount is subtracted
+	 */
+	public boolean useMoney(int amount) {
+		if(amount > money) {
+			return false;
+		}
+		money -= amount;
+		return true;
+	}
+	
 	public void enterBus() {
 		if(fromPos == toPos && fromPos >= 0 && fromPos < venster.getGamePanel().getWaitingPeople().length && 
-				venster.getGamePanel().getWaitingPeople()[fromPos] > 0 && peopleInBus < BUS_CAPACITY) {
-			final int enteringPeople = Math.min(venster.getGamePanel().getWaitingPeople()[fromPos], BUS_CAPACITY - peopleInBus);
+				venster.getGamePanel().getWaitingPeople()[fromPos] > 0 && peopleInBus < BUS_SMALL_CAPACITY) {
+			final int enteringPeople = Math.min(venster.getGamePanel().getWaitingPeople()[fromPos], BUS_SMALL_CAPACITY - peopleInBus);
 			peopleInBus += enteringPeople;
 			venster.getGamePanel().getWaitingPeople()[fromPos] -= enteringPeople;
 		}
@@ -205,9 +255,16 @@ public class App implements Serializable, Runnable, ActionListener {
 	
 	private void addWaitingPeople() {
 		for(int i=0;i<NUMBER_OF_STOPS;i++) {
-			if(rand.nextInt(maxWaitingPeople[i]) > venster.getGamePanel().getWaitingPeople()[i] && rand.nextBoolean() && rand.nextBoolean()) {
+			if(rand.nextInt(maxWaitingPeople[i]) > venster.getGamePanel().getWaitingPeople()[i] && rand.nextInt(1000) < 10) {
 				venster.getGamePanel().getWaitingPeople()[i]++;
 			}
 		}
 	}
+	
+	public void upgradeTank() {
+		if(tankSize < TANK_UPGRADE_PRICES.length && useMoney(TANK_UPGRADE_PRICES[tankSize])) {
+			tankSize++;
+		}
+	}
+	
 }

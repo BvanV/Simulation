@@ -1,7 +1,9 @@
+package game;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -18,25 +20,27 @@ public class GamePanel extends JPanel {
 	final JButton tankTenliterBtn = new JButton("Tank 10 l voor $ 10");
 	final JButton tankFiftyliterBtn = new JButton("Tank 50 l voor $ 45");
 	final JButton goToShopBtn = new JButton("Go To Shop");
-	final JLabel moneyLabel = new JLabel("$ 0");
-	final JLabel fuelLabel = new JLabel("l: 50");	
+	final JLabel moneyLbl = new JLabel("$ 0");
+	final JLabel fuelLbl = new JLabel("l: 50");
+	final JLabel scoreLbl = new JLabel("Score: 0");
 	
 	private int xPos = 40;
 	private int yPos = 760;
-	private int[] waitingPeople = {13,23};
+	private int[] waitingPeople = {0,0};
 	
 	public GamePanel(ActionListener a) {
 		super();
-		this.add(moneyLabel);
-		this.add(fuelLabel);
-		this.add(tankTenliterBtn);
-		this.add(tankFiftyliterBtn);
-		this.add(goToShopBtn);
+		add(moneyLbl);
+		add(fuelLbl);
+		add(scoreLbl);
+		add(tankTenliterBtn);
+		add(tankFiftyliterBtn);
+		add(goToShopBtn);
 		tankTenliterBtn.addActionListener(a);
 		tankFiftyliterBtn.addActionListener(a);
 		goToShopBtn.addActionListener(a);
-		moneyLabel.setBounds(1500, 100, 200, 50);
-		fuelLabel.setBounds(1500, 150, 200, 50);
+		moneyLbl.setBounds(1500, 100, 200, 50);
+		fuelLbl.setBounds(1500, 150, 200, 50);
 		try {
 			poppetje = ImageIO.read(getClass().getResource("./img/poppetje_micro.png"));
 			smallBus = ImageIO.read(getClass().getResource("./img/small_bus_small.png"));
@@ -93,11 +97,11 @@ public class GamePanel extends JPanel {
 	}
 
 	public JLabel getMoneyLabel() {
-		return moneyLabel;
+		return moneyLbl;
 	}
 
 	public JLabel getFuelLabel() {
-		return fuelLabel;
+		return fuelLbl;
 	}
 
 	public int getxPos() {
@@ -122,6 +126,10 @@ public class GamePanel extends JPanel {
 
 	public void setWaitingPeople(int[] waitingPeople) {
 		this.waitingPeople = waitingPeople;
+	}
+
+	public JLabel getScoreLbl() {
+		return scoreLbl;
 	}
 	
 }
